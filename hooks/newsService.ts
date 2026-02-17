@@ -1,3 +1,4 @@
+// src/lib/NewsService.ts  ← keep your file exactly like this
 import { NewsArticle, NewsCategory, NewsResponse } from "@/types/news";
 
 const API_KEY = "f66b46eb655241d18cadb4e2f50070fd";
@@ -8,43 +9,48 @@ export class NewsService {
         country: string = "us",
         category?: NewsCategory
     ): Promise<NewsArticle[]> {
-        let url = `${BASE_URL}/top-headlines?country=${country}&apiKey=${API_KEY}`;
-        if (category) {
-            url += `&category=${category}`;
+        try {
+            let url = `${BASE_URL}/top-headlines?country=${country}&apiKey=${API_KEY}`;
+            if (category) url += `&category=${category}`;
+
+            const response = await fetch(url);
+
+            // If offline or server error → fetch fails → catch block
+            if (!response.ok) return [];
+
+            const data = (await response.json()) as NewsResponse;
+
+            if (data.status !== "ok") return [];
+
+            return data.articles.filter(a => a.title && a.title !== "[Removed]");
+        } catch (error) {
+            // Network error, no internet, timeout → silently return empty
+            return [];
         }
-
-        const response = await fetch(url);
-        const data: NewsResponse = await response.json();
-
-        if (data.status !== "ok") {
-            throw new Error("Failed to fetch news");
-        }
-
-        return data.articles;
     }
 
     static async searchNews(
         query: string,
         sortBy: "relevancy" | "popularity" | "publishedAt" = "publishedAt"
     ): Promise<NewsArticle[]> {
-        const url = `${BASE_URL}/everything?q=${encodeURIComponent(
-            query
-        )}&sortBy=${sortBy}&apiKey=${API_KEY}`;
+        if (!query.trim()) return [];
 
-        const response = await fetch(url);
-        const data: NewsResponse = await response.json();
+        try {
+            const url = `${BASE_URL}/everything?q=${encodeURIComponent(query)}&sortBy=${sortBy}&apiKey=${API_KEY}`;
 
-        if (data.status !== "ok") {
-            throw new Error("Failed to search news");
+            const response = await fetch(url);
+            if (!response.ok) return [];
+
+            const data = (await response.json()) as NewsResponse;
+            if (data.status !== "ok") return [];
+
+            return data.articles.filter(a => a.title && a.title !== "[Removed]");
+        } catch (error) {
+            return [];
         }
-
-        return data.articles;
     }
 
-    static async getNewsByCategory(
-        category: NewsCategory,
-        country: string = "us"
-    ): Promise<NewsArticle[]> {
+    static async getNewsByCategory(category: NewsCategory, country = "us") {
         return this.getTopHeadlines(country, category);
     }
-}  
+}

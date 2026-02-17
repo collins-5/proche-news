@@ -3,7 +3,9 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useAINewsAssistant } from "@/hooks/useAINewsAssistant";
-import { Send, Newspaper, X, MessageCircle } from "lucide-react";
+import { Send, Newspaper, X, MessageCircle, Sparkles } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
+import { Button } from "./ui/button";
 
 export default function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,7 +22,7 @@ export default function AIChatbot() {
     clearNews,
   } = useAINewsAssistant();
 
-  const [messages, setMessages] = React.useState<
+  const [messages, setMessages] = useState<
     { role: "user" | "assistant"; content: string }[]
   >([]);
 
@@ -30,9 +32,7 @@ export default function AIChatbot() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, articles]);
+  useEffect(() => scrollToBottom(), [messages, articles]);
 
   useEffect(() => {
     if (response) {
@@ -53,7 +53,7 @@ export default function AIChatbot() {
     await generate();
   };
 
-  // Close when clicking outside
+  // Close on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (isOpen && !(e.target as HTMLElement).closest(".chat-container")) {
@@ -66,99 +66,119 @@ export default function AIChatbot() {
 
   return (
     <>
-      {/* Floating Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-linear-to-br from-purple-600 to-pink-600 text-white shadow-2xl hover:scale-110 transition-all duration-300 flex items-center justify-center"
-        aria-label="Open Proche AI Assistant"
-      >
-        <MessageCircle className="w-8 h-8" />
-        <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-ping"></span>
-        <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full"></span>
-      </button>
 
-      {/* Full Chat Window */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <Button
+          variant="default"
+          size="lg"
+          icon={<Icon name="message-circle" className="w-6 h-6" />}
+          onClick={() => setIsOpen(true)}
+          className="bg-accent text-black hover:bg-accent-hover shadow-2xl hover:shadow-accent/40 hover:scale-110 transition-all duration-300 rounded-full px-6 font-bold"
+        />
+      </div>
+
+      {/* Full Chat Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="chat-container relative w-full max-w-5xl h-[90vh] mx-4 bg-gray-50 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md">
+          <div className="chat-container relative w-full max-w-5xl h-[90vh] mx-6 bg-surface rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-surface-border">
             {/* Header */}
-            <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-xl">
-                  P
+            <div className="bg-surface border-b border-surface-border px-8 py-6 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center shadow-lg">
+                  <span className="text-2xl font-black text-black">P</span>
                 </div>
                 <div>
-                  <h2 className="font-bold text-gray-900">
-                    Proche AI Assistant
+                  <h2 className="text-2xl font-black text-foreground">
+                    Proche AI
                   </h2>
-                  <p className="text-sm text-gray-500">
-                    Real-time news & smart answers
+                  <p className="text-muted-foreground">
+                    Your intelligent news companion
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 {hasNews && (
                   <button
                     onClick={clearNews}
-                    className="text-sm text-gray-600 hover:text-gray-900"
+                    className="text-sm text-muted-foreground hover:text-foreground transition"
                   >
                     Clear News
                   </button>
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition"
+                  className="p-3 hover:bg-muted/50 rounded-2xl transition"
                 >
-                  <X className="w-5 h-5" />
+                  <Icon name="x" className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            {/* Messages + News Area */}
-            <div className="flex-1 overflow-y-auto px-6 py-6">
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto px-8 py-8">
               {messages.length === 0 && !hasNews ? (
-                <div className="text-center text-gray-600 mt-20">
-                  <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-linear-to-br from-purple-100 to-pink-100 flex items-center justify-center">
-                    <Newspaper className="w-12 h-12 text-purple-600" />
+                <div className="text-center mt-20">
+                  <div className="w-28 h-28 mx-auto mb-8 rounded-full bg-accent/10 flex items-center justify-center">
+                    <Newspaper className="w-16 h-16 text-accent" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-2">Hi! I'm Proche AI</h3>
-                  <p className="text-lg">
-                    Your smart assistant for news & more
+                  <h3 className="text-4xl font-black text-foreground mb-4">
+                    Hi, I'm Proche AI
+                  </h3>
+                  <p className="text-xl text-muted-foreground max-w-lg mx-auto">
+                    Ask me anything — from breaking news to deep analysis.
                   </p>
-                  <div className="mt-6 space-y-2 text-left max-w-md mx-auto bg-white rounded-xl p-6 shadow-sm">
-                    <p className="font-medium text-purple-700">Try asking:</p>
-                    <p className="text-sm">• "Show me latest tech news"</p>
-                    <p className="text-sm">• "What's happening in sports?"</p>
-                    <p className="text-sm">• "Search for climate change"</p>
-                    <p className="text-sm">• "Write me a poem about stars"</p>
+                  <div className="mt-10 space-y-3 max-w-2xl mx-auto text-left bg-surface border border-surface-border rounded-3xl p-8 shadow-xl">
+                    <p className="font-bold text-accent text-lg">Try asking:</p>
+                    {[
+                      "Latest AI breakthroughs?",
+                      "What’s happening in climate tech?",
+                      "Summarize today’s top headlines",
+                      "Explain quantum computing simply",
+                    ].map((q) => (
+                      <button
+                        key={q}
+                        onClick={() => {
+                          setPrompt(q);
+                          handleSubmit(new Event("submit") as any);
+                        }}
+                        className="block w-full text-left py-3 px-5 rounded-2xl bg-muted/50 hover:bg-accent/10 transition text-foreground"
+                      >
+                        {q}
+                      </button>
+                    ))}
                   </div>
                 </div>
               ) : (
-                <div className="space-y-6">
-                  {/* Messages */}
+                <div className="space-y-8">
                   {messages.map((msg, i) => (
                     <div
                       key={i}
-                      className={`flex gap-4 ${
+                      className={`flex gap-5 ${
                         msg.role === "user" ? "justify-end" : "justify-start"
                       }`}
                     >
                       {msg.role === "assistant" && (
-                        <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-600 to-pink-600 shrink-0 flex items-center justify-center text-white font-bold">
-                          P
+                        <div className="w-11 h-11 rounded-2xl bg-accent flex items-center justify-center shadow-lg shrink-0">
+                          <span className="text-xl font-black text-black">
+                            P
+                          </span>
                         </div>
                       )}
                       <div
-                        className={`max-w-2xl px-5 py-4 rounded-2xl ${
+                        className={`max-w-3xl px-6 py-4 rounded-3xl ${
                           msg.role === "user"
-                            ? "bg-linear-to-r from-purple-600 to-pink-600 text-white"
-                            : "bg-white border border-gray-200 text-gray-800 shadow-sm"
+                            ? "bg-accent text-black shadow-lg"
+                            : "bg-muted/50 text-foreground border border-surface-border"
                         }`}
                       >
                         <div
+                          className="prose prose-invert max-w-none"
                           dangerouslySetInnerHTML={{
                             __html: msg.content
-                              .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                              .replace(
+                                /\*\*(.*?)\*\*/g,
+                                "<strong class='font-bold text-accent'>$1</strong>"
+                              )
                               .replace(/\n/g, "<br>"),
                           }}
                         />
@@ -167,36 +187,39 @@ export default function AIChatbot() {
                   ))}
 
                   {loading && (
-                    <div className="flex gap-4">
-                      <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold">
-                        P
+                    <div className="flex gap-5">
+                      <div className="w-11 h-11 rounded-2xl bg-accent flex items-center justify-center shadow-lg">
+                        <span className="text-xl font-black text-black">P</span>
                       </div>
-                      <div className="bg-white border border-gray-200 px-5 py-4 rounded-2xl shadow-sm">
+                      <div className="bg-muted/50 px-6 py-4 rounded-3xl border border-surface-border">
                         <div className="flex gap-2">
-                          <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce delay-100"></div>
-                          <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce delay-200"></div>
+                          <div className="w-3 h-3 bg-accent rounded-full animate-bounce" />
+                          <div className="w-3 h-3 bg-accent rounded-full animate-bounce delay-100" />
+                          <div className="w-3 h-3 bg-accent rounded-full animate-bounce delay-200" />
                         </div>
                       </div>
                     </div>
                   )}
 
-                  {/* News Grid */}
+                  {/* News Articles */}
                   {isFetchingNews && (
-                    <div className="text-center py-12">
-                      <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-purple-600 border-t-transparent"></div>
-                      <p className="mt-4 text-gray-600 text-lg">
+                    <div className="text-center py-16">
+                      <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-accent border-t-transparent"></div>
+                      <p className="mt-6 text-lg text-muted-foreground">
                         Fetching latest news...
                       </p>
                     </div>
                   )}
 
                   {articles.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
                       {articles.map((article, i) => (
-                        <article
+                        <a
                           key={i}
-                          className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100"
+                          href={article.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block bg-surface rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all border border-surface-border"
                         >
                           {article.urlToImage && (
                             <img
@@ -206,29 +229,19 @@ export default function AIChatbot() {
                             />
                           )}
                           <div className="p-5">
-                            <h3 className="font-bold text-lg line-clamp-2 mb-2 text-gray-900">
+                            <h3 className="font-bold text-foreground line-clamp-2 mb-2">
                               {article.title}
                             </h3>
-                            {article.description && (
-                              <p className="text-gray-600 text-sm line-clamp-3 mb-4">
-                                {article.description}
-                              </p>
-                            )}
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="text-gray-500">
+                            <div className="flex items-center justify-between text-sm mt-4">
+                              <span className="text-accent font-semibold">
                                 {article.source.name}
                               </span>
-                              <a
-                                href={article.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-purple-600 font-semibold hover:underline"
-                              >
+                              <span className="text-muted-foreground">
                                 Read
-                              </a>
+                              </span>
                             </div>
                           </div>
-                        </article>
+                        </a>
                       ))}
                     </div>
                   )}
@@ -240,31 +253,29 @@ export default function AIChatbot() {
             {/* Input */}
             <form
               onSubmit={handleSubmit}
-              className="bg-white border-t border-gray-200 p-4"
+              className="border-t border-surface-border bg-surface p-6"
             >
-              <div className="max-w-4xl mx-auto">
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="Ask Proche AI anything..."
-                    className="flex-1 px-6 py-4 bg-gray-50 border border-gray-300 rounded-full focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-500 text-gray-800 placeholder-gray-500"
-                    disabled={loading}
-                  />
-                  <button
-                    type="submit"
-                    disabled={loading || !prompt.trim()}
-                    className="px-8 py-4 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-full hover:shadow-xl transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 font-medium"
-                  >
-                    <Send className="w-5 h-5" />
-                    Send
-                  </button>
-                </div>
-                <p className="text-center text-xs text-gray-500 mt-3">
-                  Powered by Gemini • Real-time News • Creative AI
-                </p>
+              <div className="max-w-4xl mx-auto flex gap-4">
+                <input
+                  type="text"
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Ask Proche AI anything..."
+                  className="flex-1 px-6 py-5 bg-muted/50 border border-surface-border rounded-3xl focus:outline-none focus:ring-4 focus:ring-accent/20 text-foreground placeholder:text-muted-foreground text-lg transition"
+                  disabled={loading}
+                />
+                <button
+                  type="submit"
+                  disabled={loading || !prompt.trim()}
+                  className="px-8 py-5 bg-accent text-black font-bold rounded-3xl hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition shadow-lg hover:shadow-accent/50 flex items-center gap-3"
+                >
+                  <Send className="w-5 h-5" />
+                  Send
+                </button>
               </div>
+              <p className="text-center text-xs text-muted-foreground mt-4">
+                Powered by Gemini • Real-time News • Built for Truth
+              </p>
             </form>
           </div>
         </div>

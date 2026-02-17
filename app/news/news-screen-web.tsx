@@ -1,3 +1,4 @@
+// app/news/page.tsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -5,7 +6,10 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { NewsService } from "@/hooks/newsService";
 import { formatDate } from "@/lib/utils/formatters";
+import { Icon } from "@/components/ui/icon";
+import NewsCategories from "./NewsCategories";
 
+// Shared categories — you can also move this to lib/constants.ts
 export const categories = [
   "business",
   "entertainment",
@@ -20,28 +24,15 @@ export const categories = [
 ] as const;
 
 type Category = (typeof categories)[number];
-const categoryColors: Record<Category, string> = {
-  business: "bg-red-600",
-  technology: "bg-blue-600",
-  sports: "bg-green-600",
-  entertainment: "bg-purple-600",
-  health: "bg-teal-600",
-  science: "bg-indigo-600",
-  world: "bg-gray-800",
-  politics: "bg-yellow-600",
-  environment: "bg-emerald-600",
-  food: "bg-pink-600",
-};
 
 export default function NewsScreenWeb() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
   const urlCategory = searchParams.get("category") as Category | null;
-  const validCategory =
-    urlCategory && categories.includes(urlCategory)
-      ? urlCategory
-      : categories[0];
+  const validCategory = urlCategory && categories.includes(urlCategory)
+    ? urlCategory
+    : categories[0];
 
   const [category, setCategory] = useState<Category>(validCategory);
   const [articles, setArticles] = useState<any[]>([]);
@@ -49,12 +40,11 @@ export default function NewsScreenWeb() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
-  // Sync category with URL
+  // Sync URL → state
   useEffect(() => {
-    const newCat =
-      urlCategory && categories.includes(urlCategory as any)
-        ? (urlCategory as Category)
-        : categories[0];
+    const newCat = urlCategory && categories.includes(urlCategory as any)
+      ? (urlCategory as Category)
+      : categories[0];
     setCategory(newCat);
     setIsSearching(false);
     setSearchQuery("");
@@ -63,14 +53,13 @@ export default function NewsScreenWeb() {
   const fetchNews = useCallback(async () => {
     setLoading(true);
     try {
-      const news =
-        isSearching && searchQuery.trim()
-          ? await NewsService.searchNews(searchQuery.trim())
-          : await NewsService.getTopHeadlines("us", category);
+      const news = isSearching && searchQuery.trim()
+        ? await NewsService.searchNews(searchQuery.trim())
+        : await NewsService.getTopHeadlines("us", category);
 
       setArticles(news);
     } catch (err) {
-      console.error(err);
+      console.error("Failed to fetch news:", err);
       setArticles([]);
     } finally {
       setLoading(false);
@@ -85,9 +74,7 @@ export default function NewsScreenWeb() {
     setCategory(cat);
     setIsSearching(false);
     setSearchQuery("");
-    router.push(`/news?category=${cat}`, {
-      scroll: false,
-    });
+    router.push(`/news?category=${cat}`, { scroll: false });
   };
 
   const handleSearch = () => {
@@ -100,15 +87,20 @@ export default function NewsScreenWeb() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-red-600 px-6 py-8">
-        <h1 className="text-4xl font-bold text-white tracking-tight text-center">
-          {category.charAt(0).toUpperCase() + category.slice(1)} News
-        </h1>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="bg-surface border-b border-surface-border">
+        <div className="max-w-7xl mx-auto px-6 py-10 text-center">
+          <h1 className="text-5xl font-black text-foreground">
+            {isSearching
+              ? `Search: "${searchQuery}"`
+              : category.charAt(0).toUpperCase() + category.slice(1) + " News"}
+          </h1>
+        </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        {/* Search */}
+      <div className="max-w-7xl mx-auto px-6 py-10 space-y-10">
+        {/* Search Bar */}
         <div className="relative">
           <input
             type="text"
@@ -116,124 +108,92 @@ export default function NewsScreenWeb() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            className="w-full pl-12 pr-12 py-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-600 text-lg"
+            className="w-full pl-14 pr-14 py-5 rounded-2xl bg-surface border border-surface-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-4 focus:ring-accent/20 text-lg transition-shadow"
           />
-          <svg
-            className="absolute left-4 top-5 w-6 h-6 text-gray-500"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
+          <Icon name="search" className="absolute left-5 top-6 h-6 w-6 text-muted-foreground" />
           {searchQuery && (
-            <button onClick={clearSearch} className="absolute right-4 top-5">
-              <svg
-                className="w-6 h-6 text-gray-500 hover:text-gray-700"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+            <button onClick={clearSearch} className="absolute right-5 top-6">
+              <Icon name="x" className="h-6 w-6 text-muted-foreground hover:text-foreground transition" />
             </button>
           )}
         </div>
 
-        {/* Categories */}
+        {/* Reusable Categories */}
         {!isSearching && (
-          <div className="flex flex-wrap gap-3 pb-4 border-b border-gray-200">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => handleCategoryClick(cat)}
-                className={`px-6 py-3 rounded-full font-semibold text-white transition-all ${
-                  category === cat
-                    ? categoryColors[cat]
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
-              </button>
-            ))}
-          </div>
+          <NewsCategories
+            currentCategory={category}
+            onCategoryChange={handleCategoryClick}
+          />
         )}
 
-        {/* Loading & Articles Grid */}
+        {/* Loading */}
         {loading && (
-          <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-            {[...Array(9)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-xl overflow-hidden shadow-md animate-pulse"
-              >
-                <div className="w-full h-64 bg-gray-300" />
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} className="bg-surface rounded-2xl overflow-hidden shadow-lg animate-pulse">
+                <div className="aspect-video bg-muted" />
                 <div className="p-6 space-y-4">
-                  <div className="h-6 bg-gray-300 rounded w-11/12" />
-                  <div className="h-4 bg-gray-300 rounded w-full" />
-                  <div className="h-4 bg-gray-300 rounded w-4/5" />
+                  <div className="h-7 bg-muted rounded w-11/12" />
+                  <div className="h-5 bg-muted rounded w-full" />
+                  <div className="h-5 bg-muted rounded w-4/5" />
                 </div>
               </div>
             ))}
           </div>
         )}
 
+        {/* No Results */}
         {!loading && articles.length === 0 && (
-          <p className="text-center text-gray-500 py-20 text-lg">
-            No articles found
-          </p>
+          <div className="text-center py-32">
+            <Icon name="search" className="mx-auto h-20 w-20 text-muted-foreground/30 mb-6" />
+            <h3 className="text-2xl font-bold text-foreground mb-3">
+              {isSearching ? "No results found" : "No articles available"}
+            </h3>
+            <p className="text-muted-foreground text-lg">
+              {isSearching ? "Try a different search term" : "Check back later"}
+            </p>
+          </div>
         )}
 
+        {/* Articles */}
         {!loading && articles.length > 0 && (
-          <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {articles.map((article) => (
               <article
                 key={article.url}
                 onClick={() => window.open(article.url, "_blank")}
-                className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow cursor-pointer group"
+                className="bg-surface rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group border border-surface-border"
               >
                 {article.urlToImage ? (
-                  <div className="relative aspect-video bg-gray-200">
+                  <div className="relative aspect-video overflow-hidden bg-muted">
                     <Image
                       src={article.urlToImage}
                       alt={article.title}
                       fill
                       unoptimized
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
                 ) : (
-                  <div className="bg-gray-200 aspect-video flex items-center justify-center">
-                    <span className="text-4xl font-bold text-gray-400">
-                      NEWS
-                    </span>
+                  <div className="aspect-video bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+                    <span className="text-6xl font-black text-muted-foreground/20">NEWS</span>
                   </div>
                 )}
 
-                <div className="p-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-red-600 transition-colors">
+                <div className="p-6 space-y-4">
+                  <h2 className="text-xl font-bold text-foreground line-clamp-3 group-hover:text-accent transition-colors">
                     {article.title}
                   </h2>
                   {article.description && (
-                    <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
+                    <p className="text-muted-foreground line-clamp-3 leading-relaxed">
                       {article.description}
                     </p>
                   )}
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="font-semibold text-red-600">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-semibold text-accent">
                       {article.source.name}
                     </span>
-                    <time className="text-gray-400">
+                    <time className="text-muted-foreground">
                       {formatDate(article.publishedAt)}
                     </time>
                   </div>
