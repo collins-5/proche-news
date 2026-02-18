@@ -54,7 +54,7 @@ const ArticleCard = ({ article }: { article: any }) => (
         />
       </div>
     ) : (
-      <div className="aspect-video bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+      <div className="aspect-video bg-linear-to-br from-muted to-muted/50 flex items-center justify-center">
         <span className="text-5xl font-black text-muted-foreground/30">
           NEWS
         </span>
@@ -112,9 +112,9 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-accent/20 via-background to-background py-20">
+      <section className="relative overflow-hidden bg-linear-to-br from-accent/20 via-background to-background py-20">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <h1 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-accent to-accent/60 bg-clip-text text-transparent">
+          <h1 className="text-5xl md:text-6xl font-black mb-6 bg-linear-to-r from-accent to-accent/60 bg-clip-text text-transparent">
             Stay Ahead of the News
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">

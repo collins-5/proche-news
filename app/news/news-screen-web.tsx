@@ -1,4 +1,3 @@
-// app/news/page.tsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -9,7 +8,6 @@ import { formatDate } from "@/lib/utils/formatters";
 import { Icon } from "@/components/ui/icon";
 import NewsCategories from "./NewsCategories";
 
-// Shared categories — you can also move this to lib/constants.ts
 export const categories = [
   "business",
   "entertainment",

@@ -1,4 +1,3 @@
-// src/lib/NewsService.ts  ← keep your file exactly like this
 import { NewsArticle, NewsCategory, NewsResponse } from "@/types/news";
 
 const API_KEY = "f66b46eb655241d18cadb4e2f50070fd";
@@ -15,7 +14,6 @@ export class NewsService {
 
             const response = await fetch(url);
 
-            // If offline or server error → fetch fails → catch block
             if (!response.ok) return [];
 
             const data = (await response.json()) as NewsResponse;
@@ -24,7 +22,6 @@ export class NewsService {
 
             return data.articles.filter(a => a.title && a.title !== "[Removed]");
         } catch (error) {
-            // Network error, no internet, timeout → silently return empty
             return [];
         }
     }

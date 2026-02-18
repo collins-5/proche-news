@@ -99,7 +99,7 @@ export default async function CategoryPage({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Same Header as Homepage */}
-      <header className="bg-gradient-to-r from-red-700 to-red-600 text-white">
+      <header className="bg-linear-to-r from-red-700 to-red-600 text-white">
         <div className="max-w-7xl mx-auto px-4 py-2 text-xs flex justify-between">
           <div className="flex gap-6">
             <Link href="/who-we-are" className="hover:underline">
@@ -164,7 +164,7 @@ export default async function CategoryPage({
                   />
                 </div>
               ) : (
-                <div className="h-64 bg-gradient-to-br from-gray-100 to-gray-300 flex items-center justify-center">
+                <div className="h-64 bg-linear-to-br from-gray-100 to-gray-300 flex items-center justify-center">
                   <span className="text-4xl font-bold text-gray-500">
                     {title.split(" ")[0]}
                   </span>
