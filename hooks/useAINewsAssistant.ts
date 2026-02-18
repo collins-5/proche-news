@@ -23,7 +23,7 @@ export interface NewsArticle {
 }
 
 
-const APP_URL = 'https://proche-news.vercel.app';
+const APP_URL ='https://proche-news.vercel.app';
 
 
 export const useAINewsAssistant = () => {
