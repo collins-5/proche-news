@@ -1,53 +1,53 @@
-import { NewsArticle, NewsCategory, NewsResponse } from "@/types/news";
+// app/api/news/route.ts
+import { NextRequest, NextResponse } from "next/server";
 
-const API_KEY = "f66b46eb655241d18cadb4e2f50070fd";
-const BASE_URL = "https://newsapi.org/v2";
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
 
-export class NewsService {
-    static async getTopHeadlines(
-        country: string = "us",
-        category?: NewsCategory
-    ): Promise<NewsArticle[]> {
-        try {
-            let url = `${BASE_URL}/top-headlines?country=${country}&apiKey=${API_KEY}`;
-            if (category) url += `&category=${category}`;
+  const endpoint = searchParams.get("endpoint");
+  const country = searchParams.get("country") || "us";
+  const category = searchParams.get("category");
+  const q = searchParams.get("q");
+  const sortBy = searchParams.get("sortBy") || "publishedAt";
+  const pageSize = searchParams.get("pageSize") || "15";
 
-            const response = await fetch(url);
+  if (!endpoint || !["top-headlines", "everything"].includes(endpoint)) {
+    return NextResponse.json({ error: "Invalid or missing endpoint" }, { status: 400 });
+  }
 
-            if (!response.ok) return [];
+  const apiKey = process.env.NEWS_API_KEY;
+  if (!apiKey) {
+    console.error("Missing NEWS_API_KEY in env");
+    return NextResponse.json({ error: "Server env error" }, { status: 500 });
+  }
 
-            const data = (await response.json()) as NewsResponse;
+  const params = new URLSearchParams({ apiKey });
 
-            if (data.status !== "ok") return [];
+  if (endpoint === "top-headlines") {
+    params.append("country", country);
+    if (category) params.append("category", category);
+  } else {
+    if (!q) return NextResponse.json({ error: "Missing q for everything" }, { status: 400 });
+    params.append("q", q);
+    params.append("sortBy", sortBy);
+    params.append("pageSize", pageSize);
+  }
 
-            return data.articles.filter(a => a.title && a.title !== "[Removed]");
-        } catch (error) {
-            return [];
-        }
+  const url = `https://newsapi.org/v2/${endpoint}?${params}`;
+
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+
+    if (!res.ok) {
+      const err = await res.text();
+      console.error("NewsAPI error:", res.status, err);
+      return NextResponse.json({ error: err || "NewsAPI failed" }, { status: res.status });
     }
 
-    static async searchNews(
-        query: string,
-        sortBy: "relevancy" | "popularity" | "publishedAt" = "publishedAt"
-    ): Promise<NewsArticle[]> {
-        if (!query.trim()) return [];
-
-        try {
-            const url = `${BASE_URL}/everything?q=${encodeURIComponent(query)}&sortBy=${sortBy}&apiKey=${API_KEY}`;
-
-            const response = await fetch(url);
-            if (!response.ok) return [];
-
-            const data = (await response.json()) as NewsResponse;
-            if (data.status !== "ok") return [];
-
-            return data.articles.filter(a => a.title && a.title !== "[Removed]");
-        } catch (error) {
-            return [];
-        }
-    }
-
-    static async getNewsByCategory(category: NewsCategory, country = "us") {
-        return this.getTopHeadlines(country, category);
-    }
+    const data = await res.json();
+    return NextResponse.json(data);
+  } catch (err) {
+    console.error("Fetch error:", err);
+    return NextResponse.json({ error: "Proxy failed" }, { status: 500 });
+  }
 }
