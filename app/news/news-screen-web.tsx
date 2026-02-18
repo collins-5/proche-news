@@ -175,7 +175,7 @@ export default function NewsScreenWeb() {
                     />
                   </div>
                 ) : (
-                  <div className="aspect-video bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+                  <div className="aspect-video flex items-center justify-center">
                     <span className="text-6xl font-black text-muted-foreground/20">NEWS</span>
                   </div>
                 )}

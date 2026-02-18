@@ -23,7 +23,13 @@ export interface NewsResponse {
 
 export type NewsCategory =
     | "business"
-    | "technology"
-    | "sports"
     | "entertainment"
-    | "health";
+    | "general"
+    | "health"
+    | "science"
+    | "sports"
+    | "technology"
+    | "politics"
+    | "environment"
+    | "food"
+    | "world";
