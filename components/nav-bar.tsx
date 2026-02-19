@@ -40,17 +40,8 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between py-3 text-sm">
             <div className="hidden md:flex gap-6 font-medium">
-              <Link href="/who-we-are" className="hover:underline">
+              <Link href="/" className="hover:underline">
                 WHO WE ARE
-              </Link>
-              <Link href="/careers" className="hover:underline">
-                WORK WITH US
-              </Link>
-              <Link href="/pr-agencies" className="hover:underline">
-                FOR PR AGENCIES
-              </Link>
-              <Link href="/csr" className="hover:underline">
-                CORPORATE SOCIAL RESPONSIBILITY
               </Link>
             </div>
 
@@ -146,23 +137,13 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   className="hover:text-accent transition capitalize"
-                  onClick={() => setIsMobileMenuOpen(false)} // Close on click
+                  onClick={() => setIsMobileMenuOpen(false)} 
                 >
                   {link.label}
                 </Link>
               ))}
-              {/* Optional: Add top-bar links here for mobile */}
-              <div className="flex flex-col gap-4 pt-4 border-t border-surface-border">
-                <Link href="/who-we-are" className="hover:underline">
-                  WHO WE ARE
-                </Link>
-                <Link href="/careers" className="hover:underline">
-                  WORK WITH US
-                </Link>
-                {/* ... add others if desired */}
-              </div>
+              
 
-              {/* Social icons on mobile */}
               <div className="flex gap-6 pt-4">
                 <Facebook className="w-6 h-6 cursor-pointer hover:opacity-70 transition" />
                 <Twitter className="w-6 h-6 cursor-pointer hover:opacity-70 transition" />
