@@ -23,8 +23,6 @@ export default function Navbar() {
     }
   }, [theme]);
 
-  // Optional: close mobile menu on route change (if using next/navigation)
-  // useEffect(() => { setIsMobileMenuOpen(false); }, [pathname]);
 
   const navLinks = [
     { href: "/", label: "HOME" },
@@ -38,11 +36,9 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Top Bar – Stays mostly the same, but make it more compact on mobile */}
       <header className="bg-accent text-black dark:text-white border-b border-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between py-3 text-sm">
-            {/* Left links – hide some or wrap on very small screens */}
             <div className="hidden md:flex gap-6 font-medium">
               <Link href="/who-we-are" className="hover:underline">
                 WHO WE ARE
@@ -58,9 +54,7 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* On mobile, show fewer or just social/theme/search */}
             <div className="md:hidden flex items-center gap-4">
-              {/* You can add a shortened version or just icons here if needed */}
             </div>
 
             <div className="flex items-center gap-5">
