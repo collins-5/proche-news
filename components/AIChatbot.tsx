@@ -47,17 +47,14 @@ export default function AIChatbot() {
     await generate();
   };
 
-  // Suggestion click handler (cleaner than fake event)
   const handleSuggestionClick = (question: string) => {
     setPrompt(question);
-    // Trigger submit after next render to avoid race
     setTimeout(() => {
       const form = document.querySelector("form") as HTMLFormElement;
       if (form) form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     }, 0);
   };
 
-  // Close on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (isOpen && !(e.target as HTMLElement).closest(".chat-container")) {
@@ -70,10 +67,9 @@ export default function AIChatbot() {
 
   return (
     <>
-      {/* Floating Trigger Button */}
       <div className="fixed bottom-6 right-6 z-50">
         <Button
-          variant="default" // or "outline" / custom if you want accent bg
+          variant="default" 
           size="lg"
           className="bg-accent text-black hover:bg-accent-hover shadow-2xl hover:shadow-accent/40 hover:scale-110 transition-all duration-300 rounded-full px-6 font-bold gap-2"
           onClick={() => setIsOpen(true)}
